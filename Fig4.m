@@ -1,14 +1,15 @@
 
 close all;
 clear all;
-
+addpath('E:\tfsa_5-5\windows\win64_bin');
+n=2047;
  x=cos(2*pi*0.05*(0:255)+2*pi*0.000001*(0:255).^3)+5*cos(2*pi*0.4*(0:255)-2*pi*0.0000001*(0:255).^3);%%+sin(2*pi*0.25*(0:255));%+2*pi*0.001*(0:127).^2)+sin(2*pi*0.4*(0:127));
 
- x=50*cos(2*pi*0.05*(0:255)+0*2*pi*0.0000007*(0:255).^3)+100*cos(2*pi*0.4*(0:255)-2*pi*0.0000007*(0:255).^3);%+14*cos(2*pi*0.2*(0:255));
+ %x=50*cos(2*pi*0.05*(0:255)+0*2*pi*0.0000007*(0:255).^3)+100*cos(2*pi*0.4*(0:255)-2*pi*0.0000007*(0:255).^3);%+14*cos(2*pi*0.2*(0:255));
 %  x=2*cos(2*pi*0.05*(0:255)+2*pi*0.000001*(0:255).^2);%+2*cos(2*pi*0.4*(0:255));
-%  x=4*cos(2*pi*0.01*(0:255)+2*pi*0.0001*(0:255).^2)+4*cos(2*pi*0.4*(0:255));
+  x=20*cos(2*pi*0.05*(0:n))+10*cos(2*pi*0.15*(0:n));%+10*cos(2*pi*0.2*(0:255));
 
- x_s=zeros(1,256);
+ x_s=zeros(1,2048);
  %x_s(40:80:end)=4;
  x_s(40)=1;
  x_s(41)=0;
@@ -18,14 +19,39 @@ clear all;
  
  
  x_s(120-2:120+2)=x_s(40-2:40+2);
- x_s(200-2:200+2)=x_s(40-2:40+2);
+ x_s(400-2:400+2)=x_s(40-2:40+2);
+  x_s(600-2:600+2)=x_s(40-2:40+2);
+   x_s(1000-2:1000+2)=x_s(40-2:40+2);
+    x_s(1200-2:1200+2)=x_s(40-2:40+2);
+     x_s(1800-2:1800+2)=x_s(40-2:40+2);
+      x_s(2000-2:2000+2)=x_s(40-2:40+2);
+ x=x+5*x_s;
+ x=awgn(x,30,'measured');
  
- x=x+70*x_s;
- x=x.';
-x=awgn(x,15,'measured');
-load Fig2Data;
-  actualpeaks=[40 120 200];
+ xx=x.';
+%x=awgn(x,30,'measured');
+  load dataFig4;
+  actualpeaks=[40 120 400 600 1000 1200 1800 2000 ];
   fs=1;
+ figure;plot(real(x(1:256)),'k-','LineWidth',1);set(gca, 'FontSize',25);
+ xlabel('Sample');
+ ylabel('Amplitude');
+ %title('(a) ');
+  axis([0 256 -45 45]);
+%  figure;plot(real(x_s),'k-','LineWidth',3);set(gca, 'FontSize',25);
+%  xlabel('Sample');
+%  ylabel('Amplitude');
+%  title('(b) ');
+%   axis([0 2048 0 1.1]);
+
+  figure;plot(real(x_s),'k-','LineWidth',3);set(gca, 'FontSize',25);
+ xlabel('Sample');
+ ylabel('Amplitude');
+ title('(b) ');
+  axis([0 2048 0 1.1]);
+
+  for seg=1:4
+      x=xx((seg-1)*512+1:seg*512);
 %  load('shotwithgr');
 % ss=e(:,15);
 % x=ss(1:4:end);
@@ -93,42 +119,53 @@ y=mm;
 % 
 % y= zeros(size(kest1, 1),1); y(kest1)= p1(:);
 
- %figure;plot(real(x),'k-','LineWidth',3);set(gca, 'FontSize',25);
+%  figure;plot(real(x),'k-','LineWidth',3);set(gca, 'FontSize',25);
 %  xlabel('Sample');
 %  ylabel('Amplitude');
 %  title('(a) ');
-%   axis([0 300 0 1]);
-%   figure;plot(real(x_s),'k-','LineWidth',3);set(gca, 'FontSize',25);
-%  xlabel('Sample');
-%  ylabel('Amplitude');
-%  title('(b) ');
-%  axis([0 300 0 1.1]);
- %%%%%%%%%%%%%%ADTFD%%%%%%%%%%%%
+% %  axis([0 300 0 1]);
+% %  figure;plot(real(x_s),'k-','LineWidth',3);set(gca, 'FontSize',25);
+% %  xlabel('Sample');
+% %  ylabel('Amplitude');
+% %  title('(b) ');
+% %   axis([0 2048 0 1.1]);
+%%%%%%%%%%%%%%ADTFD%%%%%%%%%%%%
 %  figure;plot(real(y),':k','LineWidth',3);set(gca, 'FontSize',25);
 %  xlabel('Sample');
 %  ylabel('Amplitude');
 %  title('Output of ADTFD before thresholding ');
-[p1, kest1]=findpeaks(y,'MINPEAKHEIGHT',0.2,'MINPEAKDISTANCE',20) ; 
-% thr1=mean(p1)+std(p1);
-% thr2=mean(p1)-std(p1);
-% for i=1:length(p1)
-%     if p1(i)<thr2
-%         p1(i)=0;
-%     end
-% end
+[p1, kest1]=findpeaks(y,'MINPEAKHEIGHT',0.4,'MINPEAKDISTANCE',20) ; 
 y= zeros(size(kest1, 1),1); y(kest1)= p1(:);
- figure;plot(real(y),':k','LineWidth',3);set(gca, 'FontSize',25);
+yy((seg-1)*512+1:seg*512)=[y zeros(1,512-length(y))];
+%  hold on;plot(real(y)+(seg-1)*512,':k','LineWidth',3);set(gca, 'FontSize',25);
+
+%  cc=round(actualpeaks*fs);
+%     
+%      cc=cc(cc<length(x)-10);
+    
+%     hold on;plot(cc,1.1,'*r','MarkerSize',25,'LineWidth',2)
+%        
+%     hold off;
+%  xlabel('Sample');
+%  ylabel('Amplitude');
+%  title('(c) ');
+  %axis([0 300 0 1.1]);
+  end
+ figure;plot(real(yy),':k','LineWidth',3);set(gca, 'FontSize',25);
+
  cc=round(actualpeaks*fs);
     
-%     cc=cc(cc<length(x)-10);
-     hold on;plot(cc,1.1,'*r','MarkerSize',25,'LineWidth',2);
-     hold off;
- xlabel('Sample');
+     cc=cc(cc<length(xx)-10);
+  hold on;plot(cc,2,'*r','MarkerSize',25,'LineWidth',2)
+  xlabel('Sample');
  ylabel('Amplitude');
- title('(a) ');
-  axis([0 300 0 1.1]);
- %%%%%%%%%%%%%%SNEO%%%%%%%
-yy=x(2:end-1).^2-x(3:end).*x(1:end-2);
+ title('(c) ');
+
+  hold off;
+   
+  %%%%%%%%%%%%%%SNEO%%%%%%%
+  clear yy;
+yy=xx(2:end-1).^2-xx(3:end).*xx(1:end-2);
 yy=filter(gausswin(20,1),1,yy);
 yy=yy/max(abs(yy));
 % yy=filter(ones(1,5),1,yy);
@@ -137,30 +174,33 @@ yy=yy/max(abs(yy));
 %    xlabel('Sample');
 %    ylabel('Amplitude');
 %  title('Output of SNEO before thresholding ');
-[p2, kest2]=findpeaks(yy,'MINPEAKHEIGHT',0.2,'MINPEAKDISTANCE',20) ; 
+[p2, kest2]=findpeaks(yy,'MINPEAKHEIGHT',0.4,'MINPEAKDISTANCE',20) ; 
 yy= zeros(size(kest2, 1),1); yy(kest2)= p2(:);
  figure;plot(real(yy),':k','LineWidth',3);set(gca, 'FontSize',25);
- hold on;plot(cc,1.1,'*r','MarkerSize',25,'LineWidth',2);
- hold off;
- axis([0 300 0 1.1]);
+ 
+ hold on;plot(cc,2,'*r','MarkerSize',25,'LineWidth',2);
+ %axis([0 300 0 1.1]);
+    hold off;
+
  xlabel('Sample');
  ylabel('Amplitude');
- title('(b) ');
+ title('(d) ');
  %%%%%%%%%%%%%%%cob%%%%%%%%%%%
-   [ft peaktrain]=spbycob1(x, 64);
+   [ft peaktrain]=spbycob1(xx, 64);
    peaktrain=peaktrain/max(abs(peaktrain));
    ft=ft/max(abs(ft));
 %    figure; plot(ft,'k:','LineWidth',3);set(gca, 'FontSize',25);
 %    xlabel('Sample');
 %    ylabel('Amplitude'); 
 %    title('Output of COB before thresholding ');
-   [p2, kest2]=findpeaks(peaktrain,'MINPEAKHEIGHT',0.2,'MINPEAKDISTANCE',20); 
+   [p2, kest2]=findpeaks(peaktrain,'MINPEAKHEIGHT',0.4,'MINPEAKDISTANCE',20); 
 yy= zeros(size(kest2, 1),1); yy(kest2)= p2(:);
    figure; plot(yy,'k:','LineWidth',3);set(gca, 'FontSize',25);
-    hold on;plot(cc,1.1,'*r','MarkerSize',25,'LineWidth',2);
+ 
+    hold on;plot(cc,2,'*r','MarkerSize',25,'LineWidth',2);
+   % axis([0 300 0 1.1]);
     hold off;
 xlabel('Sample');
    ylabel('Amplitude');
- title('(c) ');
-  axis([0 300 0 1.1]);
+ title('(e) ');
 %  save Fig2Data x x_s;
